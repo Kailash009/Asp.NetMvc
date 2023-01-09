@@ -1,0 +1,382 @@
+Entity Framework:-
+--------------------------------------
+>> it is a ORM (Object Relational Mapping) tool, it allows developers directly interact with database.
+>> ORM is a tool that directly map your model classes with your database.
+>> No Need to write sql Queries.
+>> In EF we use LINQ (Language Integrated Query).
+>> Linq queries are fast as compare to normal sql query.
+>> Linq query use Lambda Expression (=>).
+--------------------------------------------------------------------------------------------------  
+There are three types of Entity Framework-
+1. Database First Approach.
+2. Code First Approach. (Best)
+3. Model First Approach.
+-----------------------------------------------------------------------------------
+1. Database First Approach.
+------------------------------------------------------
+Step-1 :-  First Create database and tables.
+create table tbl_Employee
+(
+eid int primary key identity(1,1),
+ename nvarchar(50),
+age int,
+eaddress nvarchar(50),
+mobileno nvarchar(15)
+)
+select * from tbl_Employee
+update tbl_Employee set mobileno='479797903' where eid=1
+delete from tbl_Employee where eid=2
+
+alter table tbl_Employee drop column mobileno
+alter table tbl_Employee add mobileno nvarchar(15)
+-----------------------------------------------------------------------------------------
+Step-2:-
+---------------------
+>> Take asp.net mvc project
+Step-3:-
+-----------------------------
+Right click on models and add entity data model.
+a) Model Class.
+b) DataContext Class.
+c) ConnectionString.
+----------------------------------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Web;
+using System.Web.Mvc;
+using DatabaseFIrst.Models;
+using System.Data.Entity;
+
+namespace DatabaseFIrst.Controllers
+{
+    public class EmployeeController : Controller
+    {
+        // GET: Employee
+
+        dbGauravEntities db = new dbGauravEntities();
+        public ActionResult Index()
+        {
+            var employees=db.tbl_Employee.ToList();
+            return View(employees);
+        }
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Create(tbl_Employee empObj)
+        {
+            if (ModelState.IsValid)
+            {
+                db.tbl_Employee.Add(empObj);
+                int n=db.SaveChanges();
+                if (n != 0)
+                {
+                    TempData["insert"] = "<script>alert('Employee Added SuccessFully!!');</script>";
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    TempData["insert"] = "<script>alert('Employee Failed!!');</script>";
+                }
+            }
+            return View();
+        }
+        public ActionResult Edit(int id)
+        {
+            var employee = db.tbl_Employee.Where(m => m.eid == id).FirstOrDefault();   // LINQ Query
+            return View(employee);
+        }
+
+        [HttpPost]
+        public ActionResult Edit(tbl_Employee empObj)
+        {
+            db.Entry(empObj).State = EntityState.Modified;
+            int n=db.SaveChanges();
+            if (n != 0)
+            {
+                TempData["update"] = "<script>alert('Employee Updated SuccessFully!!');</script>";
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                TempData["update"] = "<script>alert('Employee Failed!!');</script>";
+            }
+            return View();
+        }
+        public ActionResult Delete(int id)
+        {
+            var emp = db.tbl_Employee.Where(m => m.eid == id).FirstOrDefault();
+            db.tbl_Employee.Remove(emp);
+            int n = db.SaveChanges();
+            if (n != 0)
+            {
+                TempData["delete"] = "<script>alert('Employee Deleted SuccessFully!!');</script>";
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                TempData["delete"] = "<script>alert('Employee Failed!!');</script>";
+            }
+            return View();
+        }
+        public ActionResult Details(int id)
+        {
+            var employee = db.tbl_Employee.Where(m => m.eid == id).FirstOrDefault();   // LINQ Query
+            return View(employee);
+        }
+    }
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+@model IEnumerable<DatabaseFIrst.Models.tbl_Employee>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+@Html.Raw(TempData["insert"])
+@Html.Raw(TempData["update"])
+@Html.Raw(TempData["delete"])
+
+<h2>Index</h2>
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table border="3">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.ename)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.age)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.eaddress)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.mobileno)
+        </th>
+        <th>Action</th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.ename)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.age)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.eaddress)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.mobileno)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.eid }) |
+            @Html.ActionLink("Details", "Details", new { id=item.eid }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.eid },new {onclick="return confirm('Are you Sure you want to Delete(Y/N)?');"})
+        </td>
+    </tr>
+}
+
+</table>
+----------------------------------------------------
+@model DatabaseFIrst.Models.tbl_Employee
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Create</h2>
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        <h4>tbl_Employee</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.ename, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.ename, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.ename, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.age, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.age, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.age, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.eaddress, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.eaddress, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.eaddress, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.mobileno, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.mobileno, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.mobileno, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Register" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+--------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// <auto-generated>
+//     This code was generated from a template.
+//
+//     Manual changes to this file may cause unexpected behavior in your application.
+//     Manual changes to this file will be overwritten if the code is regenerated.
+// </auto-generated>
+//------------------------------------------------------------------------------
+
+namespace DatabaseFIrst.Models
+{
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
+
+    public partial class tbl_Employee
+    {
+        [Key]
+        public int eid { get; set; }
+        
+        [Required(ErrorMessage ="Name is Required!")]
+        public string ename { get; set; }
+
+        [Required(ErrorMessage = "Age is Required!")]
+        public Nullable<int> age { get; set; }
+
+        [Required(ErrorMessage = "Address is Required!")]
+        public string eaddress { get; set; }
+        
+        [Required(ErrorMessage = "Mobile Number is Required!")]
+        public string mobileno { get; set; }
+    }
+}
+-----------------------------------------------------------------------------------------------
+@model DatabaseFIrst.Models.tbl_Employee
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        <h4>tbl_Employee</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.eid)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ename, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.ename, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.ename, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.age, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.age, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.age, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.eaddress, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.eaddress, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.eaddress, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.mobileno, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.mobileno, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.mobileno, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+-----------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
