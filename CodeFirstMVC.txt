@@ -1,0 +1,461 @@
+Entity Framework:-
+--------------------------------
+1. Database First Approach.
+2. Code First Approach.
+3. Model First Approach.
+-----------------------------------------------------------
+2. Code First Approach:-
+----------------------------------------------------------
+>> In code first Apporach, we can create following things -
+1. Model Class.
+2. Data Context Class.
+3. Connection String.
+--------------------------------------------------
+Steps:-
+---------------
+1. Install Entity Framework. -> From Nuget Package Manager.
+2. Model Class.
+using System.ComponentModel.DataAnnotations;
+namespace CodeFirstApporoachDemo.Models
+{
+    public class Employee
+    {
+        [Key]
+        public int EID { get; set; }
+        public string Name { get; set; }
+        public int Age { get; set; }
+        public string MobileNo { get; set; }
+        public string Address { get; set; }
+    }
+}
+----------------------------------------------------------------------------------------------------------------------------
+3. Data Context Class.
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Web;
+
+namespace CodeFirstApporoachDemo.Models
+{
+    public class EmployeeDbContext:DbContext
+    {
+        public EmployeeDbContext() : base("DBCS")
+        {
+            
+        }
+        public DbSet<Employee> Employees { get; set; }  // All Crud Operation
+    }
+}
+------------------------------------------------------------------------------------------------------
+4. Connection String.
+  </system.web>
+	<connectionStrings>
+		<add name="DBCS" connectionString="Data Source=MAHADEV\SQLEXPRESS;Initial Catalog=DBKhan;Integrated Security=True;" providerName="System.Data.SqlClient"/>
+	</connectionStrings>
+ -------------------------------------------------------------------------------------------------------------------------------
+5. Run Migration Command:-
+-------------------------------------------------------------
+1. enable-migrations  -> it creates Migrations Folder in your application.
+2. add-migration  'migrationName'  -> This command see your all model classes and generate ORM Query.
+3. update-database -> This command see your ORM Query and generate database and their tables into Database.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Employee Controller:-
+-----------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using CodeFirstApporoachDemo.Models;
+
+namespace CodeFirstApporoachDemo.Controllers
+{
+    public class EmployeeController : Controller
+    {
+        // GET: Employee
+        EmployeeDbContext db = new EmployeeDbContext();
+        public ActionResult Index()
+        {
+            var employees = db.Employees.ToList();
+            return View(employees);
+        }
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Create(Employee empObj)
+        {
+            db.Employees.Add(empObj);
+            int n=db.SaveChanges();
+            if (n != 0)
+            {
+                TempData["insert"] = "<script>alert('Employee Added SuccessFully!!');</script>";
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                TempData["insert"] = "<script>alert('Employee Failed!!');</script>";
+            }
+            return View();
+        }
+        public ActionResult Edit(int id)
+        {
+            var employee = db.Employees.Where(m => m.EID == id).FirstOrDefault();
+            return View(employee);
+        }
+
+        [HttpPost]
+        public ActionResult Edit(Employee empObj)
+        {
+            db.Entry(empObj).State = EntityState.Modified;
+            int n=db.SaveChanges();
+            if (n != 0)
+            {
+                TempData["update"] = "<script>alert('Employee Updated SuccessFully!!');</script>";
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                TempData["update"] = "<script>alert('Employee Failed!!');</script>";
+            }
+            return View();
+        }
+        public ActionResult Delete(int id)
+        {
+            var emp = db.Employees.Where(m => m.EID == id).FirstOrDefault();
+            if (emp != null)
+            {
+                db.Employees.Remove(emp);
+                int n = db.SaveChanges();
+                if (n != 0)
+                {
+                    TempData["delete"] = "<script>alert('Employee Deleted SuccessFully!!');</script>";
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    TempData["delete"] = "<script>alert('Employee Failed!!');</script>";
+                }
+            }
+                return View();
+        }
+        public ActionResult Details(int id)
+        {
+            var employee = db.Employees.Where(m => m.EID == id).FirstOrDefault();
+            return View(employee);
+        }
+        
+    }
+}
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+@model IEnumerable<CodeFirstApporoachDemo.Models.Employee>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+@Html.Raw(TempData["insert"])
+@Html.Raw(TempData["update"])
+@Html.Raw(TempData["delete"])
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Age)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.MobileNo)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Address)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Age)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MobileNo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Address)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.EID }) |
+                @Html.ActionLink("Details", "Details", new { id = item.EID }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.EID },new {onclick="return confirm('Are you Sure you want to delete this item(Y/N)?');"})
+            </td>
+        </tr>
+    }
+</table>
+---------------------------------
+@model CodeFirstApporoachDemo.Models.Employee
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Create</h2>
+
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        <h4>Employee</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Age, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Age, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Age, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.MobileNo, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.MobileNo, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.MobileNo, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Address, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+--------------------------------------------------------------------------------------------------
+@model CodeFirstApporoachDemo.Models.Employee
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        <h4>Employee</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.EID)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Age, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Age, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Age, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.MobileNo, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.MobileNo, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.MobileNo, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Address, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+-------------------------------------------------------------------------------------------------------
+@model CodeFirstApporoachDemo.Models.Employee
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Employee</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Age)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Age)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MobileNo)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MobileNo)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Address)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Address)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.EID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
+------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
