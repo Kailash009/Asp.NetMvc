@@ -1,0 +1,101 @@
+Filters in MVC:-
+-------------------------------------------
+>> Filters can be executed before or after action method execution.
+Before Action Method Executing -> Action Method -> After Action Method Executing.
+Types of Filter:-
+----------------------------------
+There are five types of Filter in MVC:-
+1. Authentication Filter.
+2. Authorization Filter.
+3. Action Filter.
+4. Result Filter.
+5. Exception Filter.
+-------------------------------------------------------------------
+>> After Login only Dashboard Page will open.
+-------------------------------------------------------------------
+we can make the filters with following ways:-
+---------------------------------------------------------------
+1. Action Level.
+2. Controller Level.
+3. Application Level.  --->  GlobalFilters.Filters.Add(new AuthorizeAttribute());  // Global Wise
+-----------------------------------------------------------------------------------------------------------------------------------------
+<system.web>
+		<authentication mode="Forms">
+			<forms loginUrl="Account/Login"></forms>
+		</authentication>
+		<sessionState timeout="1"></sessionState>
+----------------------------------------------------------------------------------------------------
+using MVCDemoWE.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Security;
+
+namespace MVCDemoWE.Controllers
+{
+    public class AccountController : Controller
+    {
+        // GET: Account
+        
+        public ActionResult Index()
+        {
+            return View();
+        }
+     
+        public ActionResult About()
+        {
+            return View();
+        }
+        public ActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Login(Login lgObj,string ReturnUrl)
+        {
+            //HttpCookie cookie = new HttpCookie("user");
+            if (lgObj.UserName == "pallav" && lgObj.Password == "admin")
+            {
+                //cookie["username"] = lgObj.UserName;
+                //Response.Cookies["user"].Expires = DateTime.Now.AddDays(5); // Persistent Cookie.
+                FormsAuthentication.SetAuthCookie(lgObj.UserName,true);
+                Session["username"] = lgObj.UserName;
+                return Redirect(ReturnUrl);
+            }
+            else
+            {
+                return View();
+            }
+        }
+        [Authorize]
+        public ActionResult DashBoard()
+        {
+            return View();
+        }
+        public ActionResult Logout()
+        {
+            FormsAuthentication.SignOut();
+            Session["username"] = null;
+            return View();
+        }
+    }
+}
+---------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
