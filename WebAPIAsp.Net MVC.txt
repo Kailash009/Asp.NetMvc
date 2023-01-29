@@ -1,0 +1,545 @@
+WEB API using Code First -
+----------------------------------------------------
+1. Take MVC Api Project
+2. Take Api Controller.
+----------------------------------------------------
+C -> Create ->   POST
+R -> Read  ->    GET 
+U -> Update ->  PUT
+D -> Delete  ->  DELETE
+----------------------------------------------------
+Model Class:-
+------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace WebApi.Models
+{
+    public class Employee
+    {
+        public int Eid { get; set; }
+        public string Name { get; set; }
+        public int Age { get; set; }
+        public string Address { get; set; }
+        public int Salary { get; set; }
+
+    }
+}
+------------------
+Data Context class:-
+----------------------------------
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Web;
+
+namespace WebApi.Models
+{
+    public class EmployeeDbContext:DbContext
+    {
+        public EmployeeDbContext():base("DBCS")
+        { 
+
+        }
+        public DbSet<Employee> Employees { get; set; }  // All CRUD Operation
+    }
+}
+----------------------
+Connection String:-
+------------------------------
+</system.web>
+	<connectionStrings>
+		<add name="DBCS" connectionString="Data Source=MAHADEV\SQLEXPRESS;Initial Catalog=DBApi;Integrated Security=True;" providerName="System.Data.SqlClient"/>
+	</connectionStrings>
+  <system.webServer>
+---------------------------------------------------
+Migration Command:-
+----------------------------------
+1. enable-migrations
+2. add-migration 'migrationname'
+3. update-database
+------------------------------------------
+[
+    {
+        "Eid": 1,
+        "Name": "Pallav",
+        "Age": 19,
+        "Address": "New Ashok nagar",
+        "Salary": 8767868
+    },
+    {
+        "Eid": 2,
+        "Name": "Kailash",
+        "Age": 26,
+        "Address": "Preet Vihar",
+        "Salary": 34000
+    },
+    {
+        "Eid": 3,
+        "Name": "Rajesh",
+        "Age": 18,
+        "Address": "Niman Vihar",
+        "Salary": 2499
+    }
+] -> JSON FORMAT
+--------------------------------------------------------------------------
+Employee Controller:-
+---------------------------------
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
+using WebApi.Models;
+
+namespace WebApi.Controllers
+{
+    public class EmployeeController : ApiController
+    {
+        EmployeeDbContext db = new EmployeeDbContext();
+
+        //// api/Employee
+        //[HttpGet]
+        //public string Hello(string name)
+        //{
+        //    return "Welcome" + name;
+        //}
+
+        //api/Employee
+        public IEnumerable<Employee> GetEmployees()
+        {
+            return db.Employees.ToList();
+        }
+        //api//Employee/id
+        public Employee GetEmployee(int id)
+        {
+            return db.Employees.Find(id);
+        }
+
+        //api//Employee
+        [HttpPost]
+        public HttpResponseMessage AddEmployee(Employee empObj)
+        {
+            try
+            {
+                db.Employees.Add(empObj);
+                db.SaveChanges();
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.Created); //201
+                return response;
+            }
+            catch (Exception ex)
+            {
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.InternalServerError); //500
+                return response;
+            }
+        }
+
+
+        //api//Employee/id
+        [HttpPut]
+        public HttpResponseMessage UpdateEmployee(int id, Employee empObj)
+        {
+            try
+            {
+                if (id == empObj.Eid)
+                {
+                    db.Entry(empObj).State = EntityState.Modified;
+                    db.SaveChanges();
+                    HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK); //200
+                    return response;
+                }
+                else
+                {
+                    HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.NotModified); //304
+                    return response;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.InternalServerError); //500
+                return response;
+
+            }
+        }
+
+        //api/Employee/id
+
+        [HttpDelete]
+        public HttpResponseMessage DeleteEmployee(int id)
+        {
+            Employee emp = db.Employees.Find(id);
+            if (emp != null)
+            {
+                db.Employees.Remove(emp);
+                db.SaveChanges();
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK); //200
+                return response;
+            }
+            else
+            {
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.NotFound); //500
+                return response;
+            }
+        }
+    }
+}
+----------------------------------------------------------------
+Now test your API using POSTMAN Tool
+-----------------------------------------------------------------
+Now i am going to Consume my API in my Asp.net MVC project:-
+----------------------------------------------------------------------------------------
+1. Take MVC Project.
+--------------------------------
+Newtonsoft Json.
+-----------------------------------
+2.  Serialization   -> Model Class to JSON.
+     Deserialization -> JSON to Model Class.
+----------------------------------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Web;
+
+namespace ConsumeAPIMVC.Models
+{
+    public class Employee
+    {
+        [Key]
+        public int Eid { get; set; }
+        public string Name { get; set; }
+        public int Age { get; set; }
+        public string Address { get; set; }
+        public int Salary { get; set; }
+    }
+}
+--------------------------------------------------------------
+1. add this reference in your project -> using System.net.http.
+---------------------------------------------------------------------------------------
+Make Employee Controller:-
+----------------------------------------------------
+using ConsumeAPIMVC.Models;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Web;
+using System.Web.Mvc;
+
+namespace ConsumeAPIMVC.Controllers
+{
+    public class EmployeeController : Controller
+    {
+        Uri baseaddress = new Uri("https://localhost:44377/api");
+        HttpClient client;
+        public EmployeeController()
+        {
+            client = new HttpClient();
+            client.BaseAddress = baseaddress;
+        }
+        // GET: Employee
+        public ActionResult Index()
+        {
+            List<Employee> empList = new List<Employee>();
+            HttpResponseMessage response = client.GetAsync(client.BaseAddress + "/Employee").Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string data = response.Content.ReadAsStringAsync().Result;  // JSON
+                empList = JsonConvert.DeserializeObject<List<Employee>>(data); // JSON to Model
+            }
+            return View(empList);
+        }
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Create(Employee empObj)
+        {
+            string data = JsonConvert.SerializeObject(empObj);
+            StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = client.PostAsync(client.BaseAddress + "/Employee", content).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index");
+            }
+            return View();
+        }
+        public ActionResult Edit(int id)
+        {
+            Employee empObj = new Employee();
+            HttpResponseMessage response = client.GetAsync(client.BaseAddress + "/Employee/" + id).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string data = response.Content.ReadAsStringAsync().Result;
+                empObj = JsonConvert.DeserializeObject<Employee>(data);
+            }
+            return View("Create", empObj);
+        }
+
+        [HttpPost]
+        public ActionResult Edit(Employee empObj)
+        {
+            string data = JsonConvert.SerializeObject(empObj);
+            StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = client.PutAsync(client.BaseAddress + "/Employee/" + empObj.Eid, content).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index");
+            }
+            return View("Create", empObj);
+        }
+        public ActionResult Delete(int id)
+        {
+            HttpResponseMessage response = client.DeleteAsync(client.BaseAddress + "/Employee/" + id).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index");
+            }
+            return RedirectToAction("Index");
+        }
+        public ActionResult Details(int id)
+        {
+            Employee emp = new Employee();
+            HttpResponseMessage response = client.GetAsync(client.BaseAddress + "/Employee/" + id).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string data = response.Content.ReadAsStringAsync().Result;  // JSON
+                emp = JsonConvert.DeserializeObject<Employee>(data); // JSON to Model
+            }
+            return View(emp);
+        }
+    }
+}
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Routing;
+
+namespace ConsumeAPIMVC
+{
+    public class RouteConfig
+    {
+        public static void RegisterRoutes(RouteCollection routes)
+        {
+            routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
+
+            routes.MapRoute(
+                name: "Default",
+                url: "{controller}/{action}/{id}",
+                defaults: new { controller = "Employee", action = "Index", id = UrlParameter.Optional }
+            );
+        }
+    }
+}
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+@model IEnumerable<ConsumeAPIMVC.Models.Employee>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Age)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Address)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Salary)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Age)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Address)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Salary)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Eid }) |
+            @Html.ActionLink("Details", "Details", new { id=item.Eid }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.Eid })
+        </td>
+    </tr>
+}
+
+</table>
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+@model ConsumeAPIMVC.Models.Employee
+
+@{
+    ViewBag.Title = Model != null ? "Edit" : "Create";
+}
+
+<h2>Create</h2>
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        <h4>Employee</h4>
+
+        @Html.HiddenFor(m=>m.Eid)
+        
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Age, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Age, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Age, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Address, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Salary, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Salary, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Salary, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+@model ConsumeAPIMVC.Models.Employee
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Employee</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Age)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Age)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Address)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Address)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Salary)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Salary)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Eid }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
+----------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
