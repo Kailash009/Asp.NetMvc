@@ -1,0 +1,309 @@
+Java Script:-
+-----------------------------------------------------------------
+Variable - Done
+Data type -  Done
+-------------------------------------------
+Boxes in Js
+-----------------------
+1. alert()
+2. prompt()
+3. confirm()
+---------------------------------------------------------------------------------------
+Operators in JS:-
+-----------------------------------
+Types of Operator:-
+------------------------------------
+1. Arithmetic Operator. 
+>> + , - ,* , / , % 
+wap to perform add,sub,mult,div and rem.
+------------------------------------------------------------------------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS DEMO</title>
+</head>
+<body>
+<script>
+a=parseInt(prompt("Enter First Number","First Number"))
+b=parseInt(prompt("Enter First Number","First Number"))
+sm=a+b;
+sb=a-b;
+mt=a*b;
+div=a/b;
+rem=a%b;
+console.log("Sum="+sm);
+console.log("Sub="+sb);
+console.log("Mult="+mt);
+console.log("Div="+div);
+console.log("Rem="+rem);
+</script>
+</body>
+</html>
+---------------------------------------------------------------------------------------------------------- 
+2. Relational Operator.
+>> It is used to make a relation among operand.
+>> it returns boolean value (True/False).
+--------------------------------------------------------------------------------------------
+> 
+>=
+<
+<=
+==
+!=
+===
+------------------------------------------------------------------------------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS DEMO</title>
+</head>
+<body>
+<script>
+a=parseInt(prompt("Enter First Number","First Number")) // 10
+b=parseInt(prompt("Enter First Number","First Number")) // 10
+console.log(a>b) // false
+console.log(a<b) // false
+console.log(a>=b) // true
+console.log(a<=b) // true
+console.log(a!=b) // false
+console.log(a==b) // true
+console.log(a===b) // true
+</script>
+</body>
+</html>
+--------------------------------------------------------------------------------------------------------------------------------------------
+3. Logical Operator. -> It returns Boolean value.
+and   (&&) (Ampersand)  ->  Both condition must be true then result is true otherwise false.
+or ->  (||)   Either one of the condition is true then result is True.
+not    (!)  -> If input is 0 then output is 1 and vice-versa.
+---------------------------------------------------------------------------------------------------------------------------------------------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS DEMO</title>
+</head>
+<body>
+<script>
+a=parseInt(prompt("Enter First Number","First Number")) // 20
+b=parseInt(prompt("Enter Second Number","Second Number")) // 10
+c=parseInt(prompt("Enter Third Number","Third Number")) // 5
+console.log(a>b && a<c) // false
+console.log(a>b || a>c) // true
+console.log(!(a!=b && c>a)) // true
+console.log(a==b || a==c) // false
+console.log(a<c && b>a) //  false
+console.log(!(b!=c || b<c)) // false
+</script>
+</body>
+</html>
+-------------------------------------------------------------------
+4. Assignment  (=)  -> it is used to assign a value into a variable.
+for ex;
+---------------------
+a=5;   // a variable   = -> assignment operator.   5 -> value.
+console.log(a)// 5
+--------------------------------------------------------------------------------------------------
+5. Bitwise
+Bitwise AND.   &
+Bitwise OR.     |
+Bitwise Xor.    ^
+shift left.         <<
+shift right.      >>
+---------------------------------------------------------------------------------------------------------
+Bitwise AND.   &
+--------------------------------------------
+a=5 ->  0101
+b=4 ->  0100
+----------------------------
+a&b ->  0100  -> 4 ans
+------------------------------------------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS DEMO</title>
+</head>
+<body>
+<script>
+a=parseInt(prompt("Enter First Number","First Number")) // 5
+b=parseInt(prompt("Enter Second Number","Second Number")) // 4
+console.log(a&b) // 4
+</script>
+</body>
+</html>
+-------------------------------
+Bitwise OR.   |
+--------------------------------------------
+a=5 ->  0101
+b=4 ->  0100
+----------------------------
+a|b ->  0101  -> 5  ans
+------------------------------------------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS DEMO</title>
+</head>
+<body>
+<script>
+a=parseInt(prompt("Enter First Number","First Number")) // 5
+b=parseInt(prompt("Enter Second Number","Second Number")) // 4
+console.log(a|b) // 4
+</script>
+</body>
+</html>
+------------------------------------------------------------------------------------------------------
+Bitwise Xor.    ^
+---------------------------------------
+Note :- > if the input is same then result is 0 whether both inputs are high otherwise 1.
+0 0 -> 0 
+1 1 -> 0
+----------------------------------
+a=5 ->  0101
+b=4 ->  0100
+----------------------------
+a^b ->  0001  -> 1  ans
+-----------------------------------------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS DEMO</title>
+</head>
+<body>
+<script>
+a=parseInt(prompt("Enter First Number","First Number")) // 5
+b=parseInt(prompt("Enter Second Number","Second Number")) // 4
+console.log(a^b) // 4
+</script>
+</body>
+</html>
+------------------------------------------------------------------------------------------------------------------------
+Shift Left:-
+------------------------------------------------------------------------------
+>> Shift all the bits towards its left.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS DEMO</title>
+</head>
+<body>
+<script>
+a=parseInt(prompt("Enter First Number","First Number")) // 5
+b=a<<3;  // 5<<3;
+console.log(b) // 40
+</script>
+</body>
+</html>
+--------------------------------------------
+Shift Right:-
+------------------------
+>> Shift all the bits towards its right.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS DEMO</title>
+</head>
+<body>
+<script>
+a=parseInt(prompt("Enter First Number","First Number")) // 5
+b=a>>2;  // 5>>2;
+console.log(b) //1
+</script>
+</body>
+</html>
+-------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+6. Inc/dec. -> Pending
+-------------------------------------------------------------- 
+Conditional Statements:- Pending
+-------------------------------------------
+1. if
+2, if-else
+3. if-else-if
+---------------------------------------
+1. if -> This statement is used to check only single condition.
+Syntax:-
+if(condition)
+{
+statement;
+}
+-------------------------------
+>> wap to check value is equal to 100
+== -> it check value but doesn't check type.
+===  -> it check type and value.
+
+"100" == 100 -> it doesn't check type.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS DEMO</title>
+</head>
+<body>
+<script>
+a=parseInt(prompt("Enter a value","Value"))
+console.log(typeof(a)) // String
+if(a=="100")   // "100"==100  // string to int -> no output
+{
+console.log("a is Equal to 100");  
+}
+</script>
+</body>
+</html>
+----------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
