@@ -1,0 +1,149 @@
+Repository Pattern in MVC:-
+-----------------------------------------------
+>> it is used for lose coupling.
+>> No direct dealing with database.
+>> it doesn't directly interact with Model. In repository pattern your business entites interact with repository.
+>> The repository is used to create an abstraction layer between the data access layer and the business logic layer of an application.Implementation of repository patterns can help to abstract your application from changes in the data store and can facilitate automated unit testing.
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1. Create one Folder with any Name ->  'Repository'
+2. Contract -> Interface.
+Services -> Service.
+------------------------------------------------------------------------------------------------------
+(Dependency Injection )
+>> loosely coupled code.
+------------------------------------------------------------------------------------------------------
+using RepositoryPatterninMVC.Models;
+using RepositoryPatterninMVC.Repository.Contract;
+using RepositoryPatterninMVC.Repository.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+
+namespace RepositoryPatterninMVC.Controllers
+{
+    public class EmployeeController : Controller
+    {
+        // GET: Employee
+        private readonly IEmployee _employee;
+        public EmployeeController()
+        {
+            this._employee = new EmployeeService(new EmployeeDbContext());
+        }
+        public ActionResult Index()
+        {
+            var employee=_employee.getEmployees();
+            return View(employee);
+        }
+    }
+}
+-----------------------------------------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Web;
+
+namespace RepositoryPatterninMVC.Models
+{
+    public class EmployeeDbContext:DbContext
+    {
+        public EmployeeDbContext():base("DBCS")
+        {
+            
+        }
+        public DbSet<Employee> Employees { get; set; }  // ALL CRUD Operation
+    }
+}
+------------------------------------------------------------------------------------------------------------------
+using RepositoryPatterninMVC.Models;
+using RepositoryPatterninMVC.Repository.Contract;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace RepositoryPatterninMVC.Repository.Services
+{
+    public class EmployeeService : IEmployee
+    {
+        EmployeeDbContext _dataContext;
+        public EmployeeService(EmployeeDbContext dataContext)
+        {
+            _dataContext = dataContext;
+        }
+        public List<Employee> getEmployees()
+        {
+            return _dataContext.Employees.ToList();
+        }
+        public Employee getSingleEmployee(int id)
+        {
+            throw new NotImplementedException();
+        }
+        public Employee AddEmploye(Employee empObj)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool DeleteEmployee(int id)
+        {
+            throw new NotImplementedException();
+        }
+        public Employee UpdateEmployee(Employee empObj)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}
+-------------------------------------------------------------------------------------------------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.ComponentModel.DataAnnotations;
+
+namespace RepositoryPatterninMVC.Models
+{
+    public class Employee
+    {
+        [Key]
+        public int Eid { get; set; }
+        public string Name { get; set; }
+        public int Age { get; set; }
+        public string MobileNo { get; set; }
+        public int Salary { get; set; }
+    }
+}
+------------------------------------------------------------------------------------------------------------------------
+using RepositoryPatterninMVC.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace RepositoryPatterninMVC.Repository.Contract
+{
+    public interface IEmployee
+    {
+         List<Employee> getEmployees();
+         Employee AddEmploye(Employee empObj);
+         Employee getSingleEmployee(int id);
+         Employee UpdateEmployee(Employee empObj);
+         bool DeleteEmployee(int id);
+    }
+}
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+ 
+
