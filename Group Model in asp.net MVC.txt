@@ -1,0 +1,284 @@
+Group Model in asp.net MVC:-
+------------------------------------------------------
+>> when a model contain multiple data inside model.
+--------------------------------------------------------------------------------
+School -> Multiple Teachers
+Student
+Teacher has -> Multiple Student
+--------------------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace GroupModelMVC.Models
+{
+    public class School
+    {
+        public int School_id { get; set; }
+        public string School_Name { get; set; }
+        public string City { get; set; }
+        public List<Teacher> ListofTeachers { get; set; }
+    }
+}
+----------------------------------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace GroupModelMVC.Models
+{
+    public class Student
+    {
+        public int Sid { get; set; }
+        public string SName { get; set; }
+        public int Age { get; set; }
+        public string MobileNo { get; set; }
+    }
+}
+--------------------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace GroupModelMVC.Models
+{
+    public class Teacher
+    {
+        public int Tid { get; set; }
+        public string TName { get; set; }
+        public string City { get; set; }
+        public string Role { get; set; }
+        public List<Student> ListofStudents { get; set; }
+    }
+}
+---------------------------------------------------------------
+School Operation:-
+-------------------------------
+using GroupModelMVC.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace GroupModelMVC.SchoolDbOperation
+{
+    public class SchoolOperation
+    {
+        public static List<Student> ListofStudentforTeacherA()
+        {
+            List<Student> stuList = new List<Student>();
+            Student st1=new Student();
+            st1.Sid = 1;
+            st1.SName = "Mohit";
+            st1.Age = 19;
+            st1.MobileNo = "989797979";
+            stuList.Add(st1);
+
+            Student st2 = new Student();
+            st2.Sid = 2;
+            st2.SName = "Ravi";
+            st2.Age = 29;
+            st2.MobileNo = "739797979";
+            stuList.Add(st2);
+
+            Student st3 = new Student();
+            st3.Sid = 3;
+            st3.SName = "Rahul";
+            st3.Age = 15;
+            st3.MobileNo = "349797979";
+            stuList.Add(st3);
+
+            return stuList;
+        }
+        public static List<Student> ListofStudentforTeacherB()
+        {
+            List<Student> stuList = new List<Student>();
+            Student st1 = new Student();
+            st1.Sid = 90;
+            st1.SName = "Rohan";
+            st1.Age = 34;
+            st1.MobileNo = "78397979";
+            stuList.Add(st1);
+
+            Student st2 = new Student();
+            st2.Sid = 91;
+            st2.SName = "Gunjan";
+            st2.Age = 14;
+            st2.MobileNo = "839797979";
+            stuList.Add(st2);
+
+            return stuList;
+        }
+        public static List<Student> ListofStudentforTeacherC()
+        {
+            List<Student> stuList = new List<Student>();
+            Student st1 = new Student();
+            st1.Sid = 40;
+            st1.SName = "Joy";
+            st1.Age = 24;
+            st1.MobileNo = "089797979";
+            stuList.Add(st1);
+
+            Student st2 = new Student();
+            st2.Sid = 41;
+            st2.SName = "Ravi Pratap";
+            st2.Age = 59;
+            st2.MobileNo = "439797979";
+            stuList.Add(st2);
+
+            Student st3 = new Student();
+            st3.Sid = 42;
+            st3.SName = "Suresh";
+            st3.Age = 25;
+            st3.MobileNo = "839797979";
+            stuList.Add(st3);
+
+            Student st4 = new Student();
+            st4.Sid = 43;
+            st4.SName = "Ankita";
+            st4.Age = 35;
+            st4.MobileNo = "0939797979";
+            stuList.Add(st4);
+
+            return stuList;
+        }
+        public static List<Teacher> getTeachers()
+        {
+            List<Teacher> tchList = new List<Teacher>();
+            Teacher tch1 = new Teacher();
+            tch1.Tid = 101;
+            tch1.TName = "Mr. John";
+            tch1.City = "America";
+            tch1.Role = "Computer Science";
+            tch1.ListofStudents = ListofStudentforTeacherA();
+            
+            tchList.Add(tch1);
+            
+            Teacher tch2 = new Teacher();
+            tch2.Tid = 102;
+            tch2.TName = "Mr. Mickael ";
+            tch2.City = "London";
+            tch2.Role = "Electronics";
+            tch2.ListofStudents = ListofStudentforTeacherB();
+            
+            tchList.Add(tch2);
+            
+            Teacher tch3 = new Teacher();
+            tch3.Tid = 103;
+            tch3.TName = "Mr. Danny";
+            tch3.City = "France";
+            tch3.Role = "Mechanical";
+            tch3.ListofStudents = ListofStudentforTeacherC();
+            
+            tchList.Add(tch3);
+
+            return tchList;
+        }
+        public static School getSchool()
+        {
+            School sc = new School();
+            sc.School_id = 9798797;
+            sc.School_Name = "DELHI PUBLIC SCHOOL";
+            sc.City = "NEW DELHI";
+            sc.ListofTeachers = getTeachers();
+            return sc;
+        }
+    }
+}
+------------------------------------
+School Controller:-
+-------------------------------
+using GroupModelMVC.Models;
+using GroupModelMVC.SchoolDbOperation;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+
+namespace GroupModelMVC.Controllers
+{
+    public class SchoolController : Controller
+    {
+        // GET: School
+        public ActionResult Index()
+        {
+            School _school= SchoolOperation.getSchool();
+            return View(_school);
+        }
+    }
+}
+------------------------------------------------------
+Index.cshtml:-
+-------------------------
+@model GroupModelMVC.Models.School
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2 align="center"> School Information </h2>
+<table border="3" align="center">
+    <tr>
+        <th>School ID</th>
+        <th>@Model.School_id</th>
+    </tr>
+    <tr>
+        <th>School Name</th>
+        <th>@Model.School_Name</th>
+    </tr>
+    <tr>
+        <th>School City</th>
+        <th>@Model.City</th>
+    </tr>
+</table>
+@{
+    foreach (var tch in Model.ListofTeachers)
+    {
+        <h2 align="center">Teacher Information</h2>
+        <table border="2" align="center">
+            <tr>
+                <th>TID</th>
+                <td>@tch.Tid</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>@tch.TName</td>
+            </tr>
+            <tr>
+                <th>City</th>
+                <td>@tch.City</td>
+            </tr>
+            <tr>
+                <th>Role</th>
+                <td>@tch.Role</td>
+            </tr>
+        </table>
+        <h2 align="center">Student Information</h2>
+        foreach (var stu in tch.ListofStudents)
+        {
+            <table border="2" align="center">
+                <tr>
+                    <th>SID</th>
+                    <td>@stu.Sid</td>
+                </tr>
+                <tr>
+                    <th>Name</th>
+                    <td>@stu.SName</td>
+                </tr>
+                <tr>
+                    <th>Age</th>
+                    <td>@stu.Age</td>
+                </tr>
+                <tr>
+                    <th>Mobile No</th>
+                    <td>@stu.MobileNo</td>
+                </tr>
+            </table>
+        }
+    }
+}
+--------------------------------------------------------
