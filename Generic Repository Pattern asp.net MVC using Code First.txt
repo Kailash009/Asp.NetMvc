@@ -1,0 +1,284 @@
+Generic Repository Pattern in asp.net MVC (Code First Approach):-  (WebForms MVC)
+----------------------------------------------------------------------------------------------------------------------------
+Why do we need Generic Repository Pattern in c#?
+As we already discussed, in Basic Repository, you need to create separate repositories for each and every entity present in your application. For example, if you have three entities such as Employee, Product, and Customer, then you need to create three repositories as EmployeeRepository, ProductRepository, and CustomerRepository.
+This is actually boring and repeating work, especially if all the repositories are going to do the same kind of work (i.e. typically database CRUD operations) and this is against the DRY (Don’t Repeat Yourself) principle as you are repeating the same code again and again in each repository. To solve the above problem Generic Repository Pattern comes into the picture. Please have a look at the below diagram.
+----------------------------------------------------------------------------------------------------------------
+Generic Repository:-
+--------------------------------------
+Contract:-
+------------------
+using RepositoryPatterninMVC.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+
+namespace RepositoryPatterninMVC.Repository.Contract
+{
+    // Generic Repository
+    public interface IGeneric<T> where T:class
+    {
+         List<T> GETALL();
+         void Add(T Obj);
+         T GetByID(int id);
+         void Update(T Obj);
+         void Delete(int id);
+    }
+}
+-----------------------------------------------------------------------------------
+Services:-
+-------------------
+using RepositoryPatterninMVC.Models;
+using RepositoryPatterninMVC.Repository.Contract;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Web;
+
+namespace RepositoryPatterninMVC.Repository.Services
+{
+    public class GenericService<T> : IGeneric<T> where T : class
+    {
+        private GenericDbContext _context = null;
+        private DbSet<T> table = null;
+        public GenericService()
+        {
+            _context = new GenericDbContext();
+            table = _context.Set<T>();
+        }
+
+        public List<T> GETALL()
+        {
+            return table.ToList();
+        }
+
+        public T GetByID(int id)
+        {
+            return table.Find(id);
+        }
+        public void Add(T Obj)
+        {
+            table.Add(Obj);
+            _context.SaveChanges();
+        }
+        public void Update(T Obj)
+        {
+            table.Attach(Obj);
+            _context.Entry(Obj).State = EntityState.Modified;
+            _context.SaveChanges();
+        }
+
+        public void Delete(int id)
+        {
+         T exist=table.Find(id);
+         table.Remove(exist);
+         _context.SaveChanges();
+        }
+    }
+}
+--------------------------------------------------------------------------------------------------------------------------------
+Employee Model:-
+------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.ComponentModel.DataAnnotations;
+
+namespace RepositoryPatterninMVC.Models
+{
+    public class Employee
+    {
+        [Key]
+        public int Eid { get; set; }
+        public string Name { get; set; }
+        public int Age { get; set; }
+        public string MobileNo { get; set; }
+        public int Salary { get; set; }
+    }
+}
+------------------------------
+Student Model:-
+-------------------------
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Web;
+
+namespace RepositoryPatterninMVC.Models
+{
+    public class Student
+    {
+        [Key]
+        public int Sid { get; set; }
+        public string Name { get; set; }
+        public int Age { get; set; }
+        public string MobileNo { get; set; }
+        public int Fees { get; set; }
+    }
+}
+----------------------------------------------------
+GenericDBContext-
+------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Web;
+
+namespace RepositoryPatterninMVC.Models
+{
+    public class GenericDbContext:DbContext
+    {
+        public GenericDbContext():base("DBCS")
+        {
+            
+        }
+        public DbSet<Employee> Employees { get; set; }  // ALL CRUD Operation
+        public DbSet<Student> Students { get; set; }  // ALL CRUD Operation
+    }
+}
+----------------------------------------------------------
+Employee Controller:-
+----------------------------------------
+using RepositoryPatterninMVC.Models;
+using RepositoryPatterninMVC.Repository.Contract;
+using RepositoryPatterninMVC.Repository.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+
+namespace RepositoryPatterninMVC.Controllers
+{
+    public class EmployeeController : Controller
+    {
+        // GET: Employee
+        private IGeneric<Employee> _employee;
+        public EmployeeController()
+        {
+            this._employee = new GenericService<Employee>();
+        }
+        public EmployeeController(IGeneric<Employee> _employee)
+        {
+            this._employee = _employee;
+        }
+        public ActionResult Index()
+        {
+            var employee=_employee.GETALL();
+            return View(employee);
+        }
+        public ActionResult Create()
+        { 
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Create(Employee empObj)
+        {
+            _employee.Add(empObj);
+            return RedirectToAction("Index");
+        }
+        public ActionResult Edit(int id)
+        {
+            var employee = _employee.GetByID(id);
+            return View(employee);
+        }
+
+        [HttpPost]
+        public ActionResult Edit(Employee empObj)
+        {
+            _employee.Update(empObj);
+            return RedirectToAction("Index");
+
+        }
+        public ActionResult Delete(int id)
+        {
+            _employee.Delete(id);
+            return RedirectToAction("Index");
+        }
+
+    }
+}
+-----------------------------------------------------------
+Student Controller:-
+-----------------------------
+using RepositoryPatterninMVC.Models;
+using RepositoryPatterninMVC.Repository.Contract;
+using RepositoryPatterninMVC.Repository.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+
+namespace RepositoryPatterninMVC.Controllers
+{
+    public class StudentController : Controller
+    {
+        // GET: Student
+        private  IGeneric<Student> _student;
+        public StudentController()
+        {
+            this._student = new GenericService<Student>();
+        }
+        public StudentController(IGeneric<Student> _student)
+        {
+            this._student = _student;
+        }
+        public ActionResult Index()
+        {
+            var student = _student.GETALL();
+            return View(student);
+        }
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Create(Student stuObj)
+        {
+            _student.Add(stuObj);
+            return RedirectToAction("Index");
+        }
+        public ActionResult Edit(int id)
+        {
+            var student = _student.GetByID(id);
+            return View(student);
+        }
+
+        [HttpPost]
+        public ActionResult Edit(Student stuObj)
+        {
+            _student.Update(stuObj);
+            return RedirectToAction("Index");
+
+        }
+        public ActionResult Delete(int id)
+        {
+            _student.Delete(id);
+            return RedirectToAction("Index");
+        }
+    }
+}
+----------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
