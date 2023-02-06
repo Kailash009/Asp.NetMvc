@@ -1,0 +1,274 @@
+Web API using Code First Asp.Net MVC:-
+-----------------------------------------------------------------------
+>> api is not a technology (it is concept) on which communication happens on different platforms.
+>> api is nothing it is just like a function.
+>> api returns JSON. (Java Script Object Notation).
+>> Json is a light weight.
+----------------------------------------------------------------------------------------------------------------------------------------------
+Function C# -> only C# developer can used.
+API Function -> it can be used any techno developer
+-----------------------------------
+API -> Json
+-----------------------------------
+{"id":1,"title":"iPhone 9","description":"An apple mobile which is nothing like apple","price":549,"discountPercentage":12.96,"rating":4.69,"stock":94,"brand":"Apple","category":"smartphones","thumbnail":"https://i.dummyjson.com/data/products/1/thumbnail.jpg","images":["https://i.dummyjson.com/data/products/1/1.jpg","https://i.dummyjson.com/data/products/1/2.jpg","https://i.dummyjson.com/data/products/1/3.jpg","https://i.dummyjson.com/data/products/1/4.jpg","https://i.dummyjson.com/data/products/1/thumbnail.jpg"]}
+-------------------------------------------------------------------------------------------------------------------------------------------------
+{
+"id":101
+"name":"pushpendra"
+"age":19
+} -> JSON Format.
+---------------------------------------------------------------------------------
+In Api you need to learn three things-
+1. How to create API.
+2. Test your Api.  -> To test api we use 'POSTMAN' tool.
+3. Consume your API.
+----------------------------------------------------------------------------------------------
+REST_API :-
+----------------------
+REST :-
+----------------
+>> It stands for Representational State Transfer.
+>> Rest is a communication protocol under which aur api will run.
+-------------------------------------------------------------------------------------------------------
+C -> create -> api  -> POST
+R -> read -> api     -> GET
+U -> update -> api -> PUT
+D -> delete -> api  -> DELETE
+----------------------------------------------------------------------------------
+[
+    {
+        "Eid": 1,
+        "Name": "darpan",
+        "Age": 19,
+        "MobileNo": "897979",
+        "Salary": 88688,
+        "isDel": false
+    }
+]  -> JSON FORMAT
+--------------------------------------------------
+Employee Model:-
+---------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.ComponentModel.DataAnnotations;
+
+namespace APIDEMO3PM.Models
+{
+    public class Employee
+    {
+        [Key]
+        public int Eid { get; set; }
+        public string Name { get; set; }
+        public int Age { get; set; }
+        public string MobileNo { get; set; }
+        public int Salary { get; set; }
+        public bool isDel { get; set; }
+    }
+}
+----------------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Web;
+
+namespace APIDEMO3PM.Models
+{
+    public class EmployeeDbContext:DbContext
+    {
+        public EmployeeDbContext():base("DBCS")
+        {
+            
+        }
+        public DbSet<Employee> Employees { get; set; }  // All CRUD Operation
+    }
+}
+----------------------------------------------------------------------------------
+</system.web>
+	<connectionStrings>
+		<add name="DBCS" connectionString="Data Source=MAHADEV\SQLEXPRESS;Initial Catalog=DbPush;Integrated Security=True;" providerName="System.Data.SqlClient"/>
+	</connectionStrings>
+  <system.webServer>
+----------------------------------------------------------------
+Employee Controller API:-
+-------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
+using System.Web.Services.Protocols;
+using APIDEMO3PM.Models;
+using System.Data.Entity;
+using System.Web.Configuration;
+
+namespace APIDEMO3PM.Controllers
+{
+    public class EmployeeController : ApiController
+    {
+        EmployeeDbContext db = new EmployeeDbContext();
+        //api/Employee
+        [HttpGet]
+        public string Welcome(string user)
+        {
+            return "Welcome!" + user;
+        }
+
+        [HttpGet]
+        // api/Employee
+        public IEnumerable<Employee> GetAll()
+        {
+            var emp = (from m in db.Employees where m.isDel == false select m).ToList();
+            return emp;
+        }
+
+        [HttpGet]
+        // api/Employee/id
+        public Employee Get(int id)
+        {
+            return db.Employees.Find(id);
+        }
+
+        [HttpPost]
+        // api/Employee
+        public HttpResponseMessage Save(Employee empObj)
+        {
+            try
+            {
+                db.Employees.Add(empObj);
+                db.SaveChanges();
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.Created);  // 201
+                return response;
+            }
+            catch
+            {
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                return response;
+            }
+        }
+        [HttpPut]
+        // api/Employee
+        public HttpResponseMessage Update(Employee empObj)
+        {
+            try
+            {
+                    db.Entry(empObj).State = EntityState.Modified;
+                    db.SaveChanges();
+                    HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);  // 200
+                    return response;
+            }
+            catch
+            {
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.InternalServerError);  // 500
+                return response;
+            }
+        }
+
+        // api/Employee/id     // Soft Delete
+        public HttpResponseMessage Delete(int id)
+        {
+            try
+            {
+                Employee emp = db.Employees.Find(id);
+                emp.isDel = true;
+                if (emp != null)
+                {
+                    db.Entry(emp).State = EntityState.Modified;
+                    db.SaveChanges();
+                    HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);  // 200
+                    return response;
+                }
+                else
+                {
+                    HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.NotFound);  // 404
+                    return response;
+                }
+            }
+            catch
+            {
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.InternalServerError);  // 500
+                return response;
+            }
+        }
+    }
+}
+-----------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
