@@ -1,0 +1,228 @@
+Serialization -> Model to JSON.
+Deserilization -> JSON -> MODEL.
+-------------------------------------------------------------------------------------
+Consume API:-
+------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Net.Http;
+using ConsumeWebApi.Models;
+using Newtonsoft.Json;
+using System.Reflection;
+using System.Text;
+
+namespace ConsumeWebApi.Controllers
+{
+    public class EmployeeController : Controller
+    {
+        // GET: Employee
+        Uri baseAddress = new Uri("https://localhost:44310/api/");
+        HttpClient client;
+        public EmployeeController()
+        {
+            client = new HttpClient();
+            client.BaseAddress = baseAddress;
+        }
+        public ActionResult Index()
+        {
+            List<Employee> empList = new List<Employee>();
+            HttpResponseMessage response = client.GetAsync(client.BaseAddress+"/Employee").Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string data = response.Content.ReadAsStringAsync().Result;
+                empList = JsonConvert.DeserializeObject<List<Employee>>(data);
+            }
+            return View(empList);
+        }
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Create(Employee empObj)
+        {
+            string data = JsonConvert.SerializeObject(empObj);
+            StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = client.PostAsync(client.BaseAddress + "/Employee", content).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index");
+            }
+            return View();
+        }
+        public ActionResult Edit(int id)
+        {
+            Employee empObj = new Employee();
+            HttpResponseMessage response = client.GetAsync(client.BaseAddress + "/Employee/" + id).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string data = response.Content.ReadAsStringAsync().Result;
+                empObj = JsonConvert.DeserializeObject<Employee>(data);
+            }
+            return View("Create", empObj);
+        }
+
+        [HttpPost]
+        public ActionResult Edit(Employee empobj)
+        {
+            string data = JsonConvert.SerializeObject(empobj);
+            StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = client.PutAsync(client.BaseAddress + "/Employee/" + empobj.Eid, content).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index");
+            }
+            return View("Create", empobj);
+        }
+        public ActionResult Delete(int id)
+        {
+            HttpResponseMessage response = client.DeleteAsync(client.BaseAddress + "/Employee/" + id).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index");
+            }
+            return RedirectToAction("Index");
+        }
+    }
+}
+-----------------------------------------------------------------------------------------------------------------------
+@model IEnumerable<ConsumeWebApi.Models.Employee>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Age)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.MobileNo)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Salary)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.isDel)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Age)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.MobileNo)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Salary)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.isDel)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Eid }) |
+            @Html.ActionLink("Details", "Details", new { id=item.Eid }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.Eid })
+        </td>
+    </tr>
+}
+
+</table>
+---------------------------------------------------------------------------------------
+@model ConsumeWebApi.Models.Employee
+
+@{
+    ViewBag.Title =Model!=null?"Edit":"Create";
+}
+
+<h2>Create</h2>
+
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        <h4>Employee</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Age, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Age, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Age, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.MobileNo, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.MobileNo, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.MobileNo, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Salary, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Salary, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Salary, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.isDel, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <div class="checkbox">
+                    @Html.EditorFor(model => model.isDel)
+                    @Html.ValidationMessageFor(model => model.isDel, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                @Html.HiddenFor(m=>m.Eid)
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+-------------------------------------------------------------------------------------------------
+
+
