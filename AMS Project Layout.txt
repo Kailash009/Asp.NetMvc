@@ -1,0 +1,14 @@
+-----------------------------------------------------------
+Date of Submission -> 16 Feb 2023.
+------------------------------------------------------------
+AMS:-   MVC or WebForm
+------------------------------------------------
+Roles  -    1. Admin. -> login. -> List of doctor/List of patient/ Edit/Delete/Details.  -> Logout
+	2. Doctor. -> signup/login  -> List of appointment Patient.  -> Checkup Done. ->  Change Password. -> Logout
+	3. Patient. -> signup/login. -> List of Doctor -> Book Appointment -> Search Doctor. -> Change Password. -> Logout.
+	a) Home.
+	b) Customer Support.
+	c) AboutUs.
+	d)  Services.
+	e) ContactUs.
+---------------------------------------------------------------------------------------------------------------------------------------------------------
