@@ -1,0 +1,126 @@
+JQuery MVC Demo - Insert
+--------------------------------------------------
+using MVCJQuery.Models;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Data;
+namespace MVCJQuery.Controllers
+{
+    public class EmployeeController : Controller
+    {
+        SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["DBCS"].ToString());
+        // GET: Employee
+        public ActionResult Create()
+        {
+            return View();
+        }
+        public void Insert(Employee empObj)
+        {
+            if (con.State == ConnectionState.Closed)
+            {
+                con.Open();
+            }
+            string sql = "insert into Employees(Ename,Age,Address,Salary)values(@name,@age,@address,@salary)";
+            SqlCommand cmd = new SqlCommand(sql,con);
+            cmd.Parameters.AddWithValue("@name", empObj.Name);
+            cmd.Parameters.AddWithValue("@age", empObj.Age);
+            cmd.Parameters.AddWithValue("@address", empObj.Address);
+            cmd.Parameters.AddWithValue("@salary", empObj.Salary);
+            cmd.ExecuteNonQuery();
+            con.Close();
+        }
+    }
+}
+----------------------------------------------------------------------------------------------------
+Create.cshtml:-
+-----------------------------
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Add New Employee</h2>
+<html>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <table>
+                <tr>
+                    <td>Name</td>
+                    <td> <input type="text" id="txtName" /> </td>
+                </tr>
+                <tr>
+                    <td>Age</td>
+                    <td> <input type="text" id="txtAge" /> </td>
+                </tr>
+                <tr>
+                    <td>Address</td>
+                    <td> <input type="text" id="txtAddress" /> </td>
+                </tr>
+                <tr>
+                    <td>Salary</td>
+                    <td> <input type="text" id="txtSalary" /> </td>
+                </tr>
+
+                <tr>
+                    <td></td>
+                    <td>
+                        <input type="button" id="btnReg" value="Regiser" onclick="SaveData()"/>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</body>
+</html>
+<script src="~/Content/jquery-3.6.3.js"></script>
+<script type="text/javascript">
+    function Clear() {
+        $("#txtName").val("");
+        $("#txtAge").val("");
+        $("#txtAddress").val("");
+        $("#txtSalary").val("");
+    }
+    function SaveData() {
+        debugger;
+        $.ajax({
+            url: "Employee/Insert",
+            type: 'post',
+            data: { Name: $("#txtName").val(), Age: $("#txtAge").val(), Address: $("#txtAddress").val(), Salary: $("#txtSalary").val() },
+            success: function () {
+                alert('Employee Saved SuccessFully!!');
+                Clear();
+            },
+            error: function () {
+                alert('Data Not Saved!!');
+            }
+        });
+    }
+</script>
+------------------------------------------------------------------------------------------------------------
+Employee Model:-
+--------------------------------
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Web;
+
+namespace MVCJQuery.Models
+{
+    public class Employee
+    {
+        [Key]
+        public int Eid { get; set; }
+        public string Name { get; set; }
+        public int Age { get; set; }
+        public string Address { get; set; }
+        public int Salary { get; set; }
+    }
+}
+----------------------------------------------------------------------------------------------------
