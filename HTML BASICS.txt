@@ -1,0 +1,302 @@
+SGML -> Standard Generalized Markup Language.
+--------------------------------------------------------------------------------------------
+HTML :-
+-------------------
+>> It stands for Hyper Text Markup Language.
+>> It is tag based language.
+>> Tag must be define inside angular brackets. < >
+>> Http protocol is used to access html pages.
+>> Html contains predefined tags.
+>> Html is not a case sensitive.
+>> The file extension of html file is .html or .htm.
+--------------------------------------------------------------------------------------------------------
+Types of Tags:-
+--------------------------------
+a) Paired Tag/Container. -> which open and close 
+	<body> </body> , <p> </p> , <div> </div> etc.
+b) Unpaired/Empty -> which open and close itself.
+	<br/> , <hr/>  <img/>
+--------------------------------------------------------------------------------------------------------
+Structure of HTML:-
+-----------------------------------------------------
+<html>
+
+<head>
+
+<title></title>
+
+</head>
+
+<body>
+// Html main programming written here......
+</body>
+
+</html>
+----------------------------------------------
+HTML IDE :-
+----------------------
+notepad,notepad++ ,  brackets ,, eclipse,,, dreamweaver.
+VS CODE   ->  dowload vs code from here --->>> https://code.visualstudio.com/download
+------------------------------------------------------------------------------------------------------------------------------------------------------
+Heading Tag:-
+--------------------------------------
+h1  -> Largest
+h2
+h3
+h4
+h5
+h6  -> Smallest
+------------------------------------------------------------
+<h1>Hello HTML</h1>
+    <h2>Hello HTML</h2>
+    <h3>Hello HTML</h3>
+    <h4>Hello HTML</h4>
+    <h5>Hello HTML</h5>
+    <h6>Hello HTML</h6>
+-----------------------------------------------------
+Formatting Tag :-
+-------------------------------------
+<b></b>
+<i></i>
+<super></super> 
+<sub></sub>
+<strike></strike>
+<font></font>
+-------------------------------------------
+Font Tag:-
+-----------------------------------------
+<font>
+</font>
+---------------------
+Attributes :-
+---------------------------------
+a) size
+b) face
+c) color
+-------------------------------------
+<html lang="en">
+<head>
+    <title>SMS</title>
+</head>
+
+<body>
+    <b>Hello Bold</b>   <br/>
+    <i>Hello Italic</i>  <br/>
+    X <sup>2</sup> <br/>
+    1 <sup>st</sup> <br/>
+    2 <sup>nd</sup> <br/>
+    H <sub> 2 </sub>  O <br/>
+    H <sub> 2 </sub>  O S O <sub>4</sub>  <br/>
+
+<font size="20" color="red" face="comic sans ms">
+    Hello Font Tag How are You ??? 
+</font>
+</body>
+</html>
+-------------------------------------------------------------------------------------------------------
+Marquee Tag :-
+------------------------------
+>> it is used to provide animation in text and images.
+<marquee bgcolor="pink" behavior="alternate" scrollamount="40" onmouseover="stop();" onmouseout="start();" >
+---------------------
+Image Tag:-
+------------------------------
+<body background="images/nature.jpg">
+<img src="path"/>
+<marquee  behavior="alternate" scrollamount="40" onmouseover="stop();" onmouseout="start();" >
+<h2> Hello Marquee how are you??? </h2>
+<img alt="HANU" src="images/hanu.jpg" height="500px" width="500px"/>
+<img src="images/ganesh.jpg"/>
+<img src="images/shiv.jpg"/>
+</marquee>
+------------------------------------------------------------------
+Anchor Tag:-
+----------------------------
+<a href="path"></a>
+-------------------------------------------
+<a href="https://www.cetpainfotech.com/" target="_blank"> CETPA </a> <br/>
+<a href="https://www.facebook.com/" target="_blank"> Facebook </a>  <br/>
+<a href="https://www.google.com/" target="_blank"> Google </a> <br/>
+<a href="https://www.gmail.com/" target="_blank"> Gmail </a> <br/>
+------------------------------------------------------------------------------------------------------------------------------
+List in HTML:-
+--------------------------------------------
+1. Ordered List. -> By Default 1,2,3 ....  <ol start=""  type="">
+2. Unordered List. -> By Default Bullats.
+3. Defination List.
+dl -> Defination List 
+dt -> Defination table.
+dd -> Defination Description.
+-----------------------------------------------------------------------------------
+Nested List:-
+--------------------------
+<html lang="en">
+<head>
+    <title>SMS</title>
+</head>
+
+<body bgcolor="lime">
+   <h1>List in html</h1>
+<h2>Ordered LIST</h2>
+<ol type="A">
+    <li>JAVA</li>
+    <li>SQL</li>
+    <li>PHP</li>
+    <li>DOT NET</li>
+    <li>ANGULAR</li>
+</ol>
+
+<h2>UnOrdered LIST</h2>
+<ul type="disc">
+    <li>JAVA</li>
+    <li>SQL</li>
+    <li>PHP</li>
+    <li>DOT NET</li>
+    <li>ANGULAR</li>
+</ul>
+
+<h2>Defination List</h2>
+<dl>
+<dt> JAVA </dt>
+<dd> Java is a High Level Programming Language which was developed by James Gosling in 1995. </dd>
+</dl>
+
+<h1> Example of Nested List</h1>
+<ol type="a">
+    <li>Java</li>
+    <dl>
+        <dd> Java is a High Level Programming Language which was developed by James Gosling in 1995. </dd>
+        </dl>        
+    <ul>
+        <li>Core</li>
+        <li>Advance</li>
+        <li>Spring Boot</li>
+    </ul>  
+    <li>Python</li>
+    <ol type="i">
+        <li>Machine Learning</li>
+        <li>Data Science</li>
+        <li>Data Analyst</li>
+    </ol>
+    <li>Php</li>
+    <li>C#</li>
+    <ol>
+        <li>Basic</li>
+        <li>Advance</li>
+        <li>Core</li>
+    </ol>
+    <li>Angular</li>
+    <ul>
+        <li>Basic</li>
+        <li>Material</li>
+    </ul>
+</ol>
+</body>
+</html>
+------------------------------------------------------------------------------------------------------------
+Table --- Pending
+-------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
